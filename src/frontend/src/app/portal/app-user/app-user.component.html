@@ -1,10 +1,10 @@
 <div class="clr-row">
   <div class="clr-col-lg-12 clr-col-md-12 clr-col-sm-12 clr-col-xs-12">
-    <div class="clr-row flex-items-xs-between flex-items-xs-top" style="padding-left: 15px; padding-right: 15px;">
+    <!--<div class="clr-row flex-items-xs-between flex-items-xs-top" style="padding-left: 15px; padding-right: 15px;">
       <h2 class="header-title">{{'USER.APP_USER_LIST' | translate}}</h2>
-    </div>
+    </div>-->
     <create-edit-app-user (create)="createAppUser($event)"></create-edit-app-user>
-    <div class="table-search">
+    <div class="table-search" style="margin-top:-23px">
       <div class="table-search-left">
         <button
           *ngIf="authService.currentNamespacePermission.appUser.create || authService.currentAppPermission.appUser.create || authService.currentUser.admin"

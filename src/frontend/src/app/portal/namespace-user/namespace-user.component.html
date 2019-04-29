@@ -1,11 +1,11 @@
 <div class="content-area" style="position: relative">
-  <wayne-box style="padding: 15px;">
+  <wayne-box>
     <div class="clr-row">
       <div class="clr-col-lg-12 clr-col-md-12 clr-col-sm-12 clr-col-xs-12">
-        <div class="clr-row flex-items-xs-between flex-items-xs-top" style="padding-left: 15px; padding-right: 15px;">
+        <!--<div class="clr-row flex-items-xs-between flex-items-xs-top" style="padding-left: 15px; padding-right: 15px;">
           <h2 class="header-title">{{'TITLE.MEMBER_LIST' | translate}}</h2>
-        </div>
-        <div class="table-search">
+        </div>-->
+        <div class="table-search" style="padding: 15px;">
           <div class="table-search-left"
                *ngIf="authService.currentNamespacePermission.namespaceUser.create || authService.currentUser.admin">
             <button class="wayne-button normal" (click)="openModal()">

@@ -1,19 +1,19 @@
 <div class="content-area" style="position: relative">
   <div class="clr-row">
     <div class="clr-col-lg-12 clr-col-md-12 clr-col-sm-12 clr-col-xs-12">
-      <div class="clr-row flex-items-xs-between flex-items-xs-top" style="padding-left: 15px; padding-right: 15px;">
+      <div class="clr-row flex-items-xs-between flex-items-xs-top" style="padding-left: 10px; padding-right:10px;margin-left:-10px">
         <div class="cluster-outline" style="display: flex; flex-wrap: wrap;width: 100%;">
-          <wayne-card *ngIf="authService.currentNamespacePermission.app.create || authService.currentUser.admin" (click)="openModal()" style="cursor: pointer;">
+          <!--<wayne-card *ngIf="authService.currentNamespacePermission.app.create || authService.currentUser.admin" (click)="openModal()" style="cursor: pointer;" class="create-app-style">
             <div
-              style="flex: 1;display: flex; justify-content: center; align-items: center; color: #377aec; font-size: 20px;">
-              <svg style="width: 16px; height: 16px;fill: #377aec; margin-right: 5px;" viewBox="0, 0, 40 , 40"
+              style="flex: 1;display: flex; justify-content: center; align-items: center; color: #f9f9fa; font-size: 16px;">
+              <svg style="width: 16px; height: 16px;fill: #f9f9fa; margin-right: 5px;" viewBox="0, 0, 40 , 40"
                    xmlns="http://www.w3.org/2000/svg">
                 <rect x="0" y="18.5" width="40" height="3" rx="1.5" ry="1.5"></rect>
                 <rect x="18.5" y="0" width="3" height="40" rx="1.5" ry="1.5"></rect>
               </svg>
               {{'TITLE.CREATE_APP' | translate}}
             </div>
-          </wayne-card>
+          </wayne-card>-->
           <ng-container *ngFor="let cluster of clusters; let i = index">
             <wayne-card @cardState *ngIf="cluster.state" [header]="cluster.name">
               <div
@@ -32,7 +32,7 @@
             </wayne-card>
           </ng-container>
         </div>
-        <p class="card-show-p">
+        <p *ngIf="clusters.length >= allowNumber" class="card-show-p">
           <span *ngIf="clusters.length >= allowNumber" (click)="changeCard()">
             <span *ngIf="!allowShowAll">{{'ACTION.FOLD' | translate}}</span>
             <span *ngIf="allowShowAll">{{'ACTION.UNFOLD' | translate}}</span>
@@ -47,6 +47,8 @@
         <wayne-box>
           <div class="table-search" style="padding: 0 15px;">
             <div class="table-search-left">
+              <button *ngIf="authService.currentNamespacePermission.app.create || authService.currentUser.admin" (click)="openModal()" class="wayne-button primary"> {{'TITLE.CREATE_APP' | translate}}
+              </button>
               <button class="wayne-button active" [class.active]="!starredFilter"
                       (click)="starredChange(false)">{{'TITLE.ALL_CONTENT' | translate}}</button>
               <button class="wayne-button" [class.active]="starredFilter"
