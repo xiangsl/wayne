@@ -1,4 +1,4 @@
-<div class="item" [style.opacity]="showContent ? 1 : 0.7">
+<div class="item" [style.opacity]="showContent ? 0.7 : 1">
   <ng-content></ng-content>
 </div>
 <div *ngIf="showContent" @contentState class="content" [class.nowrap]="size === 'small'" [style.width.px]="width"

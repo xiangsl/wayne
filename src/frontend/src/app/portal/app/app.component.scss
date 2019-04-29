@@ -115,7 +115,7 @@
   margin-top: 0;
   margin-right: 2%;
   width: 100%;
-  height: 24px;
+  height: 8px;
 
   span {
     color: #377aec;
@@ -129,4 +129,19 @@
 
 .cluster-outline {
   transition: height 200ms;
+}
+.create-app-style{
+  background: #00c0ef;
+  box-shadow: 0 0 0 0 #ccc;
+  border-radius: 3px;
+  width: 140px;
+  height: 24px;
+  padding: 15px 20px;
+  margin-right: 15px;
+  margin-bottom: 15px;
+  flex: none;
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: top;
+  border-top: 3px solid #00c0ef;
 }

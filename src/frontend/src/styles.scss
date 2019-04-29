@@ -1,5 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
-
+body, h1, h2, h3, h4, h5, h6{
+  margin: 0!important;
+}
+h2{
+  &.header-title{
+    font-size: 20px!important;
+  }
+}
 .flex {
   display: flex;
   flex-wrap: nowrap;
@@ -135,7 +142,7 @@ textarea {
 }
 
 .breadcrumb > li > a {
-  color: #0275d8;
+  color: #3c8dbc;
 }
 
 .breadcrumb > li {
@@ -155,7 +162,34 @@ textarea {
 .wayne-clr-datagrid {
   height: auto !important;
 }
-
+.datagrid{
+  .datagrid-header{
+    .datagrid-column{
+      font-size: 14px !important;
+      height: 45px!important;
+      .datagrid-column-title{
+        margin: auto;
+      }
+      .datagrid-filter-toggle{
+        margin: auto;
+      }
+    }
+  }
+  .datagrid-cell{
+    font-size: 14px !important;
+    height: 45px;
+  }
+  .datagrid-column{
+    font-size: 14px !important;
+    height: 45px;
+  }
+  .datagrid-footer-description{
+    height: 45px !important;
+    wayne-paginate{
+      margin: auto !important;
+    }
+  }
+}
 .datagrid-host {
   height: auto !important;
 }
@@ -283,3 +317,18 @@ a {
 @import "./component/hack";
 @import "./component/form.scss";
 @import "./component/tpl.scss";
+
+.btn {
+  &.btn-primary{
+    -webkit-box-shadow:0 0 0 0 #0095d3 !important;;
+    box-shadow:0 0 0 0 #0095d3 !important;
+  }
+  &.btn-outline{
+    -webkit-box-shadow:0 0 0 0 #0095d3 !important;;
+    box-shadow:0 0 0 0 #0095d3 !important;    
+  }
+  &.btn-danger{
+    -webkit-box-shadow:0 0 0 0 #0095d3 !important;;
+    box-shadow:0 0 0 0 #0095d3 !important;    
+  }  
+}
