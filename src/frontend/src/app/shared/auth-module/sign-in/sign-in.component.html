@@ -1,10 +1,12 @@
 <div class="container">
   <form class="login" #ngForm="ngForm">
     <div>
+      <!--
       <div style="padding-bottom:5px;text-align:center;">
         <img src="assets/images/wayne-logo.blue.svg" width="200px" alt=""><br>
         <strong>{{getTitle()}} {{version}}</strong>
       </div>
+      -->
     </div>
     <div *ngIf="authService.config?.enableDBLogin || authService.config?.ldapLogin"
          style="padding-bottom:5px;text-align:center;">
