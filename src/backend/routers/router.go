@@ -19,6 +19,7 @@ import (
 	"github.com/Qihoo360/wayne/src/backend/controllers/bill"
 	"github.com/Qihoo360/wayne/src/backend/controllers/cluster"
 	"github.com/Qihoo360/wayne/src/backend/controllers/config"
+	"github.com/Qihoo360/wayne/src/backend/controllers/images"
 	"github.com/Qihoo360/wayne/src/backend/controllers/configmap"
 	"github.com/Qihoo360/wayne/src/backend/controllers/cronjob"
 	"github.com/Qihoo360/wayne/src/backend/controllers/daemonset"
@@ -322,6 +323,11 @@ func init() {
 
 	nsWithoutApp := beego.NewNamespace("/api/v1",
 		// 路由中不携带任何id
+		beego.NSNamespace("/images",
+			beego.NSInclude(
+				&images.ImagesController{},
+			),
+		),		
 		beego.NSNamespace("/configs",
 			beego.NSInclude(
 				&config.ConfigController{},

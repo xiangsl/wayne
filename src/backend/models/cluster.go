@@ -125,7 +125,6 @@ func (*clusterModel) GetAllNormal() ([]Cluster, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return clusters, nil
 }
 

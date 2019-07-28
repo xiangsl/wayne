@@ -14,6 +14,8 @@ import { ClusterService } from '../../shared/client/v1/cluster.service';
 import { PublicService } from '../../shared/client/v1/public.service';
 import { PublishStatusService } from '../../shared/client/v1/publishstatus.service';
 import { LogClient } from '../../shared/client/v1/kubernetes/log';
+import { ImagesListComponent } from './images-list/images-list.component';
+import { ImagesService } from 'app/shared/client/v1/images.service';
 
 @NgModule({
   imports: [
@@ -28,7 +30,8 @@ import { LogClient } from '../../shared/client/v1/kubernetes/log';
     PublicService,
     PodClient,
     PublishStatusService,
-    LogClient
+    LogClient,
+    ImagesService
   ],
   exports: [
     DeploymentComponent
@@ -39,6 +42,7 @@ import { LogClient } from '../../shared/client/v1/kubernetes/log';
     ListDeploymentComponent,
     CreateEditDeploymentTplComponent,
     PublishDeploymentTplComponent,
+    ImagesListComponent,
   ]
 })
 

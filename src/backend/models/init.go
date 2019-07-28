@@ -7,11 +7,13 @@ import (
 )
 
 var (
-	globalOrm orm.Ormer
-	once      sync.Once
+	globalOrm    orm.Ormer
+	globalOrmImm orm.Ormer
+	once         sync.Once
 
 	UserModel                     *userModel
 	AppModel                      *appModel
+	ImagesModel                   *imagesModel
 	AppUserModel                  *appUserModel
 	AppStarredModel               *appStarredModel
 	NamespaceUserModel            *namespaceUserModel
@@ -95,6 +97,7 @@ func init() {
 	// init models
 	UserModel = &userModel{}
 	AppModel = &appModel{}
+	ImagesModel = &imagesModel{}
 	AppUserModel = &appUserModel{}
 	AppStarredModel = &appStarredModel{}
 	NamespaceUserModel = &namespaceUserModel{}
@@ -136,6 +139,15 @@ func init() {
 func Ormer() orm.Ormer {
 	once.Do(func() {
 		globalOrm = orm.NewOrm()
+		globalOrmImm = orm.NewOrm()
+		globalOrmImm.Using("imm")
 	})
 	return globalOrm
+}
+func OrmerImm() orm.Ormer {
+	once.Do(func() {
+		globalOrmImm = orm.NewOrm()
+		globalOrmImm.Using("imm")
+	})
+	return globalOrmImm
 }

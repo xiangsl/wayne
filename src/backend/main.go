@@ -10,4 +10,5 @@ func main() {
 	cmd.Version = Version
 
 	cmd.RootCmd.Execute()
+
 }

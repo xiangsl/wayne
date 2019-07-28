@@ -1,0 +1,62 @@
+<wayne-collapse *ngIf="ifShow">
+    <label class="label-level1" id="select-image">选择镜像</label>
+      <div class="form-group form-group-padding">
+        <label class="clr-col-md-3 form-group-label-override">
+            版本名称
+        </label>
+        <label aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-bottom-left">
+          <input type="text" [(ngModel)]="version_name"  [placeholder]="'TEMPLATE.VERSION_HINT' | translate">
+        </label>
+        <label class="clr-col-md-3 form-group-label-override">
+
+        </label>
+        <div style="margin-top:-10px;">
+          <button type="button" class="btn btn-primary" (click)="listImages()">查询镜像</button>
+        </div>
+      </div>
+      <div>
+        <clr-datagrid class="wayne-clr-datagrid">
+            <clr-dg-column>
+              <ng-container>版本名称</ng-container>
+            </clr-dg-column>
+            <clr-dg-column>
+              <ng-container>镜像名称</ng-container>
+            </clr-dg-column>
+            <clr-dg-column>
+              <ng-container>镜像标签</ng-container>
+            </clr-dg-column>
+            <clr-dg-column>
+              <ng-container>镜像地址</ng-container>
+            </clr-dg-column>
+            <clr-dg-column class="col-time">
+              <ng-container>创建时间</ng-container>
+            </clr-dg-column>
+            <clr-dg-column class="col-operate">
+              <ng-container>操作</ng-container>
+            </clr-dg-column>
+
+            <clr-dg-row *ngFor="let app of apps" [clrDgItem]="app">
+              <clr-dg-cell>{{app.version_name}}</clr-dg-cell>
+              <clr-dg-cell>{{app.repository}}</clr-dg-cell>
+              <clr-dg-cell>{{app.tag}}</clr-dg-cell>
+              <clr-dg-cell>{{app.repository_harbor}}</clr-dg-cell>
+              <clr-dg-cell>{{app.create_date}}</clr-dg-cell>
+              <clr-dg-cell class="col-operate">
+                  <button class="wayne-button text" (click)="selectImage(app)">选择</button>
+                  <button class="wayne-button text" (click)="imageDetail(app)">详情</button>
+              </clr-dg-cell>
+            </clr-dg-row>
+
+            <clr-dg-footer>
+              <wayne-paginate
+                [(currentPage)]="page.currentPage"
+                [total]="page.totalCount"
+                [pageSizes]="[10, 20, 50]"
+                (sizeChange)="pageSizeChange($event)"
+                (currentPageChange)="curPageChange($event)"
+              >
+              </wayne-paginate>
+            </clr-dg-footer>
+        </clr-datagrid>
+    </div>
+</wayne-collapse>

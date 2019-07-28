@@ -92,6 +92,16 @@ func ensureDatabase() error {
 		}
 
 	}
+	//这里注册imm数据库
+	dbName1 := beego.AppConfig.String("DBName1")
+	if dbName1 != "" {
+		dbURL1 := fmt.Sprintf("%s:%s@%s/", beego.AppConfig.String("DBUser1"),
+			beego.AppConfig.String("DBPasswd1"), beego.AppConfig.String("DBTns1"))
+		err = orm.RegisterDataBase("imm", "mysql", addLocation(fmt.Sprintf("%s%s", dbURL1, dbName1)))
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

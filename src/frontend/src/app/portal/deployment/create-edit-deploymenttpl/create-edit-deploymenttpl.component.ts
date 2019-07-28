@@ -69,7 +69,7 @@ export class CreateEditDeploymentTplComponent extends ContainerTpl implements On
   box: HTMLElement;
   eventList: any[] = Array();
   defaultSafeExecCommand = 'sleep\n30';
-
+  public ifSelectImage: any = false;
   constructor(private deploymentTplService: DeploymentTplService,
               private aceEditorService: AceEditorService,
               private fb: FormBuilder,
@@ -730,5 +730,11 @@ export class CreateEditDeploymentTplComponent extends ContainerTpl implements On
     const imagePrefix = this.authService.config['system.image-prefix'];
     return imagePrefix;
   }
-
+  openImageList(){
+    this.ifSelectImage = true;
+  }
+  selectImage(imageUrl: string) {
+    this.kubeResource.spec.template.spec.containers[0].image = imageUrl;
+    this.ifSelectImage = false;
+  }
 }

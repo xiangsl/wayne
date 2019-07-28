@@ -65,6 +65,7 @@
           </label>
         </div>
     </wayne-collapse>
+    <wayne-images-list (selectImg)="selectImage($event)" *ngIf="ifSelectImage"></wayne-images-list>
     <wayne-collapse *ngFor="let container of kubeResource.spec.template.spec.containers; let i = index">
         <label class="label-level1" [id]="i ? 'container-config' + i : 'container-config'">{{'TEMPLATE.CONTAINER_CONFIG' | translate}}
           <clr-icon (click)="onDeleteContainer(i)" shape="trash" title="删除容器" class="is-solid"></clr-icon>
@@ -89,7 +90,7 @@
                    class="tooltip tooltip-validation tooltip-md tooltip-bottom-left">
               <input type="text" size="90" class="clr-col-sm-12" name="container.image_{{i}}" required
                      pattern="{{getImagePrefixReg()}}" [(ngModel)]="container.image"
-                     [placeholder]="'TEMPLATE.IMAGE_ADDRESS' | translate">
+                     [placeholder]="'TEMPLATE.IMAGE_ADDRESS_HINT' | translate" (dblclick)="openImageList()">
               <span class="tooltip-content">
                 {{'RULE.REGEXT' | translate}}{{getImagePrefixReg()}}
               </span>
@@ -129,7 +130,6 @@
           </div>
 
         </div>
-
         <div class="container-box">
           <label class="label-level2" [id]="i ? '启动命令' + i : '启动命令'">启动命令
             <button (click)="onAddContainerCommand(i)" style="margin-left: 10px;" class="wayne-button primary">
