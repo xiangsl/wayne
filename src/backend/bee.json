@@ -8,7 +8,7 @@
     "models": "",
     "others": []
   },
-  "cmd_args": [],
+  "cmd_args": ["apiserver"],
   "envs": [],
   "database": {
     "driver": "mysql"
