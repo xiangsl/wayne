@@ -7,6 +7,7 @@ import { EventManager } from '@angular/platform-browser';
 import { MessageHandlerService } from '../../../shared/message-handler/message-handler.service';
 import { ImagesService } from 'app/shared/client/v1/images.service';
 
+
 @Component({
   selector: 'wayne-images-list',
   templateUrl: './images-list.component.html',
