@@ -20,6 +20,6 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
   ]
 })
 export class CollapseComponent {
-  show = true;
+  @Input() show = true;
   @Input() disabled: boolean;
 }

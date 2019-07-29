@@ -65,6 +65,82 @@
           </label>
         </div>
     </wayne-collapse>
+    <wayne-collapse [show]="false">
+        <label class="label-level1" id="update-strategy">磁盘挂载</label>
+        <div class="container-box">
+            <label for="a" class="label-level2">挂载配置
+              <button style="margin-left: 10px;" class="wayne-button primary" (click)="onAddVolume($event)">
+                <clr-icon shape="add-text"></clr-icon>添加配置
+              </button>
+            </label>
+            <div *ngFor="let item of kubeResource.spec.template.spec.volumes;let i=index;">
+              <div class="form-group form-group-padding">
+                <label class="clr-col-md-3 form-group-label-override required">挂载方式</label>
+                <div class="select select-fixd-width">
+                  <select [(ngModel)]="volumes[i]" name="volumeType_{{i}}" (change)="volumeChange($event.target.value,i)">
+                    <option value="hostPath">主机路径</option>
+                    <option value="emptyDir">POD共享</option>
+                    <option value="configMap">配置集加载</option>
+                    <option value="persistentVolumeClaim">PVC挂载</option>
+                  </select>
+                </div>
+                <clr-icon style="margin-top: 10px;margin-left: 5px;" shape="trash" class="is-solid" (click)="deleteVolume(i)"></clr-icon>
+              </div>
+              <div class="form-group form-group-padding">
+                <label class="clr-col-md-3 form-group-label-override required">挂载名称</label>
+                <label aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-bottom-left">
+                  <input type="text" size="90" class="clr-col-sm-12" name="vlume.name_{{i}}" required [(ngModel)]="item.name" [placeholder]="'英文数字补字母-_'">
+                </label>
+              </div>
+              <div class="form-group form-group-padding" *ngIf="volumes[i]=='hostPath'">
+                <label class="clr-col-md-3 form-group-label-override required">磁盘路径</label>
+                <label aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-bottom-left">
+                  <input type="text" size="90" class="clr-col-sm-12" name="hostPath.name_{{i}}" required [(ngModel)]="item.hostPath.path" [placeholder]="'物理机磁盘路径'">
+                </label>
+              </div>
+              <div class="form-group form-group-padding" *ngIf="volumes[i]=='emptyDir'">
+                <label class="clr-col-md-3 form-group-label-override required">最大容量</label>
+                <label aria-haspopup="true" [class.invalid]="!checkMemory(item.emptyDir.sizeLimit)" style="padding-right: 0;margin-right: 0;padding-left: 0"
+                        role="tooltip" class="clr-col-md-6 tooltip tooltip-validation tooltip-md tooltip-bottom-left">
+                  <input type="number" style="width:inherit" name="emptyDir.name_{{i}}" required [(ngModel)]="item.emptyDir.sizeLimit" [placeholder]="'单位 G (空为无限制)'">
+                  <span class="tooltip-content">最大容量为整数</span>
+                </label>
+              </div>
+              <div *ngIf="volumes[i]=='configMap'">
+                <div class="form-group form-group-padding">
+                  <label class="clr-col-md-3 form-group-label-override required">配置集名称</label>
+                  <label aria-haspopup="true" style="padding-right: 0;margin-right: 0;padding-left: 0" role="tooltip" class="clr-col-md-6 tooltip tooltip-validation tooltip-md tooltip-bottom-left">
+                    <div class="select select-fixd-width" style="display: inline-block">
+                      <select [(ngModel)]="item.configMap.name" name="item.configMap_{{i}}">
+                        <option value="{{config.name}}" *ngFor="let config of configMaps">{{config.name}}</option>
+                      </select>
+                    </div>
+                    <div class="toggle-switch" style="display: inline-block">
+                        <input type="checkbox" [checked]="checkConfigMapArray[i]" (change)="checkConfigMap(i)" id="checkConfigMap_{{i}}">
+                        <label class="label-level3" for="checkConfigMap_{{i}}">{{'不启用key配置'}}</label>
+                    </div>
+                  </label>
+                </div>
+                <div class="form-group form-group-padding" *ngFor="let keyToPath of item.configMap.items;let j=index;">
+                    <input type="text" size="40" required name="keyToPath.key.name_{{i}}"
+                          [(ngModel)]="keyToPath.key"
+                          [placeholder]="'配置集key'">
+                    <input type="text" size="40" required name="keyToPath.key.path_{{i}}"
+                          [(ngModel)]="keyToPath.path"
+                          [placeholder]="'配置集路径'">
+                    <clr-icon style="margin-top: 10px;margin-right: 8px" (click)="onAddKeyToPath(i)" shape="plus-circle" [title]="'TEMPLATE.ADD_ENVIRONMENT' | translate" class="is-solid"></clr-icon>
+                    <clr-icon style="margin-top: 10px" (click)="deleteKeyToPath(i,j)" shape="trash" [title]="'TEMPLATE.DELETE_ENVIRONMENT' | translate" class="is-solid"></clr-icon>
+                </div>
+              </div>
+              <div class="form-group form-group-padding" *ngIf="volumes[i]=='persistentVolumeClaim'">
+                  <label class="clr-col-md-3 form-group-label-override required">pvc名称</label>
+                  <label aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-bottom-left">
+                    <input type="text" size="90" class="clr-col-sm-12" name="persistentVolumeClaim.name_{{i}}" required [(ngModel)]="item.persistentVolumeClaim.claimName" [placeholder]="'输入已有pvc名称'">
+                  </label>
+              </div>
+            </div>
+        </div>
+    </wayne-collapse>
     <wayne-images-list (selectImg)="selectImage($event)" *ngIf="ifSelectImage"></wayne-images-list>
     <wayne-collapse *ngFor="let container of kubeResource.spec.template.spec.containers; let i = index">
         <label class="label-level1" [id]="i ? 'container-config' + i : 'container-config'">{{'TEMPLATE.CONTAINER_CONFIG' | translate}}
@@ -128,7 +204,34 @@
                 style="color: red">price: {{container.resources.limits.cpu * cpuUnitPrice | number:'1.2-2'}}{{'UNIT.PRICE' | translate}}</label>
             </label>-->
           </div>
-
+        </div>
+        <div class="container-box">
+            <label for="a" class="label-level2">目录挂载
+              <button style="margin-left: 10px;" class="wayne-button primary" (click)="onAddVolumeMount(i)">
+                <clr-icon shape="add-text"></clr-icon>添加目录
+              </button>
+            </label>
+            <div *ngFor="let volumeMount of container.volumeMounts;let j=index;">
+              <div class="form-group form-group-padding">
+                <label class="clr-col-md-3 form-group-label-override required">挂载名称</label>
+                <div class="select select-fixd-width">
+                  <select [(ngModel)]="volumeMount.name" name="volumeMount{{j}}">
+                    <option value="{{volume.name}}" *ngFor="let volume of kubeResource.spec.template.spec.volumes">{{volume.name}}</option>
+                  </select>
+                </div>
+                <clr-icon style="margin-top: 10px;margin-left: 5px;" shape="trash" class="is-solid" (click)="deleteVolumeMount(i,j)"></clr-icon>
+              </div>
+              <div class="form-group form-group-padding">
+                <label class="clr-col-md-3 form-group-label-override required">容器目录</label>
+                <label aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-bottom-left">
+                  <input type="text" size="60" name="volumeMount.mountPath_{{i}}" required [(ngModel)]="volumeMount.mountPath" [placeholder]="'容器内部路径'">
+                </label>
+                <label class="clr-col-md-3 form-group-label-override required">远程子目录</label>
+                <label aria-haspopup="true" role="tooltip" class="tooltip tooltip-validation tooltip-md tooltip-bottom-left">
+                  <input type="text" size="60" name="volumeMount.subPath_{{i}}" [(ngModel)]="volumeMount.subPath" [placeholder]="'仅在配置集时生效(可选)'">
+                </label>
+              </div>
+            </div>
         </div>
         <div class="container-box">
           <label class="label-level2" [id]="i ? '启动命令' + i : '启动命令'">启动命令
@@ -146,11 +249,11 @@
           <div class="form-group form-group-padding">
             <label style="color: #007cbb" class="label-level2" [id]="i ? '镜像拉取策略' + i : '镜像拉取策略'">镜像拉取策略
             </label>
-            <div class="select">
+            <div class="select  select-fixd-width">
               <select [(ngModel)]="container.imagePullPolicy" name="imagePullPolicy_{{i}}">
-                <option value="IfNotPresent">IfNotPresent</option>
-                <option value="Always">Always</option>
-                <option value="Never">Never</option>
+                <option value="IfNotPresent">本地优先</option>
+                <option value="Always">远程优先</option>
+                <option value="Never">仅用本地</option>
               </select>
             </div>
           </div>
@@ -186,7 +289,7 @@
                   <span class="tooltip-content">{{'TEMPLATE.LOAD_GROUP_MESSAGE' | translate}}</span>
                 </a>
               </label>
-              <div class="select">
+              <div class="select  select-fixd-width">
                 <select id="envFromType-{{i}}-{{j}}" name="envFrom.type_{{i}}_{{j}}"
                         (change)="envFromChange($event.target.value,i,j)">
                   <option value="1" [selected]="envFrom.configMapRef">{{'TEMPLATE.LOAD_CONFIGMAP' | translate}}</option>
@@ -225,7 +328,7 @@
                   <span class="tooltip-content">{{'TEMPLATE.SUPPORT_ENVIRONMENT_MESSAGE' | translate}}</span>
                 </a>
               </label>
-              <div class="select">
+              <div class="select  select-fixd-width">
                 <select id="envType-{{i}}-{{j}}" name="env.type_{{i}}_{{j}}"
                         (change)="envChange($event.target.value,i,j)">
                   <option value="0" [selected]="env.value!=null">{{'TEMPLATE.LOAD_ENVIRONMENT' | translate}}</option>
@@ -319,7 +422,7 @@
             <div class="form-group form-group-padding">
               <label for="readinessProbeType_{{i}}"
                      class="clr-col-md-3 form-group-label-override required">{{'TEMPLATE.READINESS_CHECK_WAY' | translate}}</label>
-              <div class="select">
+              <div class="select  select-fixd-width">
                 <select name="readinessProbeType_{{i}}" (change)="readinessProbeTypeChange($event.target.value,i)">
                   <option value="0"
                           [selected]="container.readinessProbe.httpGet">{{'TEMPLATE.HTTP_REQUEST' | translate}}</option>
@@ -407,7 +510,7 @@
             <div class="form-group form-group-padding">
               <label for="livenessProbeType_{{i}}"
                      class="clr-col-md-3 form-group-label-override required">{{'TEMPLATE.READINESS_CHECK_WAY' | translate}}</label>
-              <div class="select">
+              <div class="select  select-fixd-width">
                 <select name="livenessProbeType_{{i}}" (change)="livenessProbeTypeChange($event.target.value,i)">
                   <option value="0"
                           [selected]="container.livenessProbe.httpGet">{{'TEMPLATE.HTTP_REQUEST' | translate}}</option>
@@ -457,7 +560,7 @@
           <div *ngIf="container.lifecycle" style="color:#000">
             <div class="form-group form-group-padding">
               <label for="lifecycleType_{{i}}" class="clr-col-md-3 form-group-label-override required">postStart</label>
-              <div class="select">
+              <div class="select  select-fixd-width">
                 <select name="lifecycleType_{{i}}" (change)="lifecyclePostStartProbeTypeChange($event.target.value,i)">
                   <option value="-1" [selected]="!container.lifecycle.postStart">{{'TEMPLATE.NOT_USE' | translate}}</option>
                   <option value="0"
@@ -495,7 +598,7 @@
           <div *ngIf="container.lifecycle" style="color:#000">
             <div class="form-group form-group-padding">
               <label for="lifecycleType_{{i}}" class="clr-col-md-3 form-group-label-override required">preStop</label>
-              <div class="select">
+              <div class="select  select-fixd-width">
                 <select name="lifecycleType_{{i}}" (change)="lifecyclePreStopProbeTypeChange($event.target.value,i)">
                   <option value="-1" [selected]="!container.lifecycle.preStop">{{'TEMPLATE.NOT_USE' | translate}}</option>
                   <option value="0"

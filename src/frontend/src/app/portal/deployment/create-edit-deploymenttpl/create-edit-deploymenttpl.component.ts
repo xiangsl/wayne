@@ -9,6 +9,13 @@ import {
   ConfigMapEnvSource,
   ConfigMapKeySelector,
   Container,
+  Volume,
+  HostPathVolumeSource,
+  EmptyDirVolumeSource,
+  ConfigMapProjection,
+  PersistentVolumeClaimVolumeSource,
+  KeyToPath,
+  VolumeMount,
   DeploymentStrategy,
   EnvFromSource,
   EnvVar,
@@ -43,6 +50,9 @@ import { AceEditorService } from '../../../shared/ace-editor/ace-editor.service'
 import { AceEditorMsg } from '../../../shared/ace-editor/ace-editor';
 import { defaultDeployment } from '../../../shared/default-models/deployment.const';
 import { containerDom, ContainerTpl, templateDom } from '../../../shared/base/container/container-tpl';
+import { ConfigMapService } from 'app/shared/client/v1/configmap.service';
+import { PageState } from 'app/shared/page/page-state';
+import { ConfigMap } from 'app/shared/model/v1/configmap';
 
 
 
@@ -70,12 +80,16 @@ export class CreateEditDeploymentTplComponent extends ContainerTpl implements On
   eventList: any[] = Array();
   defaultSafeExecCommand = 'sleep\n30';
   public ifSelectImage: any = false;
+  public volumes=[];
+  public checkConfigMapArray=[];
+  configMaps: ConfigMap[];
   constructor(private deploymentTplService: DeploymentTplService,
               private aceEditorService: AceEditorService,
               private fb: FormBuilder,
               private router: Router,
               private location: Location,
               private deploymentService: DeploymentService,
+              private configMapService: ConfigMapService,
               private appService: AppService,
               public authService: AuthService,
               public cacheService: CacheService,
@@ -181,10 +195,17 @@ export class CreateEditDeploymentTplComponent extends ContainerTpl implements On
     const container = new Container();
     container.resources = new ResourceRequirements();
     container.resources.limits = {'memory': '', 'cpu': ''};
+    container.resources.limits = {'memory': '', 'cpu': ''};
     container.env = [];
     container.envFrom = [];
     container.imagePullPolicy = 'IfNotPresent';
+    container.volumeMounts=[];
     return container;
+  }
+  deFaultVolume(): Volume{
+    const volume = new Volume();
+    volume.hostPath=new HostPathVolumeSource();
+    return volume;
   }
 
   ngOnInit(): void {
@@ -215,6 +236,15 @@ export class CreateEditDeploymentTplComponent extends ContainerTpl implements On
           this.saveDeployment(JSON.parse(this.deploymentTpl.template));
         }
         this.initNavList();
+      },
+      error => {
+        this.messageHandlerService.handleError(error);
+      }
+    );
+    //这里查询配置集
+    this.configMapService.list(PageState.fromState({sort: {by: 'id', reverse: false}}, {pageSize: 1000}), 'false', appId + '').subscribe(
+      response => {
+        this.configMaps = response.data.list.sort((a, b) => a.order - b.order);
       },
       error => {
         this.messageHandlerService.handleError(error);
@@ -259,6 +289,76 @@ export class CreateEditDeploymentTplComponent extends ContainerTpl implements On
     this.initNavList();
   }
 
+  onAddVolume( event: Event) {
+    event.stopPropagation();
+    this.kubeResource.spec.template.spec.volumes.push(this.deFaultVolume());
+    this.volumes.push('hostPath');
+    this.checkConfigMapArray.push(false);
+  }
+
+  deleteVolume(index: any) {
+    this.kubeResource.spec.template.spec.volumes.splice(index, 1);
+    this.volumes.splice(index, 1);
+  }
+  volumeChange(value: any, i: any) {
+    const volume = this.kubeResource.spec.template.spec.volumes[i];
+    if(value=='hostPath'){
+      volume.hostPath=new HostPathVolumeSource();
+      volume.emptyDir=undefined;
+      volume.persistentVolumeClaim=undefined;
+      volume.configMap=undefined;
+    }else if(value=='emptyDir'){
+      volume.emptyDir=new EmptyDirVolumeSource();
+      volume.hostPath=undefined;
+      volume.persistentVolumeClaim=undefined;
+      volume.configMap=undefined;
+    }else if(value=='configMap'){
+      volume.configMap=new ConfigMapProjection();
+      volume.configMap.items=[]
+      volume.configMap.items.push(new KeyToPath());
+      volume.hostPath=undefined;
+      volume.emptyDir=undefined;
+      volume.persistentVolumeClaim=undefined;
+      if(this.configMaps.length>0){
+        volume.configMap.name=this.configMaps[0].name;
+      }
+    }else if(value=='persistentVolumeClaim'){
+      volume.persistentVolumeClaim=new PersistentVolumeClaimVolumeSource();
+      volume.hostPath=undefined;
+      volume.emptyDir=undefined;
+      volume.configMap=undefined;
+    }
+  }
+  onAddVolumeMount(index: any){
+    let volumeMount = new VolumeMount();
+    this.kubeResource.spec.template.spec.containers[index].volumeMounts.push(volumeMount);
+  }
+  deleteVolumeMount(i:any, j: any){
+    this.kubeResource.spec.template.spec.containers[i].volumeMounts.splice(j,1);
+  }
+  onAddKeyToPath(i: any){
+    this.kubeResource.spec.template.spec.volumes[i].configMap.items.push(new KeyToPath());
+  }
+  deleteKeyToPath(i: any,j: any){
+    this.kubeResource.spec.template.spec.volumes[i].configMap.items.splice(j,1);
+  }
+  checkConfigMap(i: any){
+    this.checkConfigMapArray[i]=!this.checkConfigMapArray[i];
+    if(this.checkConfigMapArray[i]){
+      this.kubeResource.spec.template.spec.volumes[i].configMap.items=[];
+    }else{
+      this.kubeResource.spec.template.spec.volumes[i].configMap.items.push(new KeyToPath());
+    }
+  }
+  checkNotNull(i,type){
+    let volume = this.kubeResource.spec.template.spec.volumes[i];
+    if(type=='name'){
+      if(volume.name==''||volume.name==null){
+        return false;
+      }
+      return true;
+    }
+  }
   onAddEnv(index: number, event: Event) {
     event.stopPropagation();
     if (!this.kubeResource.spec.template.spec.containers[index].env) {
@@ -597,6 +697,11 @@ export class CreateEditDeploymentTplComponent extends ContainerTpl implements On
       if (cpuLimit) {
         container.resources.limits['cpu'] = cpuLimit.toString();
         container.resources.requests['cpu'] = (parseFloat(cpuLimit) * cpuRequestLimitPercent).toString();
+      }
+    }
+    for (const volume of kubeDeployment.spec.template.spec.volumes) {
+      if(volume.emptyDir&&volume.emptyDir.sizeLimit){
+        volume.emptyDir.sizeLimit = volume.emptyDir.sizeLimit + 'Gi';
       }
     }
     return kubeDeployment;
