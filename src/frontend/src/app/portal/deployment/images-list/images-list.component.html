@@ -25,9 +25,6 @@
             <clr-dg-column>
               <ng-container>镜像标签</ng-container>
             </clr-dg-column>
-            <clr-dg-column>
-              <ng-container>镜像地址</ng-container>
-            </clr-dg-column>
             <clr-dg-column class="col-time">
               <ng-container>创建时间</ng-container>
             </clr-dg-column>
@@ -39,7 +36,6 @@
               <clr-dg-cell>{{app.version_name}}</clr-dg-cell>
               <clr-dg-cell>{{app.repository}}</clr-dg-cell>
               <clr-dg-cell>{{app.tag}}</clr-dg-cell>
-              <clr-dg-cell>{{app.repository_harbor}}</clr-dg-cell>
               <clr-dg-cell>{{app.create_date}}</clr-dg-cell>
               <clr-dg-cell class="col-operate">
                   <button class="wayne-button text" (click)="selectImage(app)">选择</button>
