@@ -307,9 +307,11 @@
                      [placeholder]="'PLACEHOLDER.ENVIRONMENT' | translate">
             </div>
             <div *ngIf="envFrom && envFrom.configMapRef" class="form-group form-group-padding">
-              <input type="text" size="40" required name="envFrom.configMapRef.name_{{i}}_{{j}}"
-                     [(ngModel)]="envFrom.configMapRef.name"
-                     [placeholder]="'TEMPLATE.CONFIGMAP_NAME' | translate">
+              <div class="select select-fixd-width" style="display: inline-block">
+                <select [(ngModel)]="envFrom.configMapRef.name" name="item.configMap_{{i}}">
+                  <option value="{{config.name}}" *ngFor="let config of configMaps">{{config.name}}</option>
+                </select>
+              </div>
             </div>
             <div *ngIf="envFrom && envFrom.secretRef" class="form-group form-group-padding">
               <input type="text" size="40" required name="envFrom.secretRef.name_{{i}}_{{j}}"
@@ -352,9 +354,11 @@
                      [placeholder]="'TEMPLATE.ENVIRONMENT_NUM' | translate">
             </div>
             <div *ngIf="env.valueFrom && env.valueFrom.configMapKeyRef" class="form-group form-group-padding">
-              <input type="text" size="40" required name="env.valueFrom.configMapKeyRef.name_{{i}}_{{j}}"
-                     [(ngModel)]="env.valueFrom.configMapKeyRef.name"
-                     [placeholder]="'TEMPLATE.CONFIGMAP_NAME' | translate">
+              <div class="select select-fixd-width" style="display: inline-block">
+                <select [(ngModel)]="env.valueFrom.configMapKeyRef.name" name="item.configMap_{{i}}">
+                  <option value="{{config.name}}" *ngFor="let config of configMaps">{{config.name}}</option>
+                </select>
+              </div>
               <input type="text" size="40" required name="env.valueFrom.configMapKeyRef.key_{{i}}_{{j}}"
                      [(ngModel)]="env.valueFrom.configMapKeyRef.key"
                      [placeholder]="'TEMPLATE.CONFIGMAP_KEY' | translate">
